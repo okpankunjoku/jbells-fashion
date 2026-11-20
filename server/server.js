@@ -36,36 +36,91 @@ const storeSettingRoutes = require("./routes/storeSettingRoutes");
 // Create Express application
 const app = express();
 
+// ========================================
+// CORS CONFIGURATION
+// ========================================
+
+// Add your deployed frontend domains and local development URL.
+// CLIENT_URL on Render can also contain multiple comma-separated origins.
+
+const configuredOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
+const allowedOrigins = new Set([
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+
+  // JBELLS Vercel production domains
+  "https://jbells-fashion.vercel.app",
+  "https://jbells-fashion-t28s.vercel.app",
+
+  // Additional origins configured on Render
+  ...configuredOrigins,
+]);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests without an Origin header.
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/+$/, "");
+
+    if (allowedOrigins.has(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    console.warn("CORS blocked origin:", origin);
+
+    return callback(new Error("Origin not allowed by CORS"));
+  },
+
+  credentials: true,
+
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Accept",
+  ],
+
+  optionsSuccessStatus: 204,
+};
+
+// Apply CORS before security middleware and API routes.
+// This also handles browser OPTIONS preflight requests.
+app.use(cors(corsOptions));
+
 // Security headers
 app.use(helmet());
 
-// CORS configuration
-const allowedOrigins = (
-  process.env.CLIENT_URL || "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+// ========================================
+// REQUEST BODY PARSING
+// ========================================
+
+app.use(express.json({ limit: "10kb" }));
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests without an Origin header, such as server-to-server requests.
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Origin not allowed by CORS"));
-    },
-    credentials: true,
+  express.urlencoded({
+    extended: true,
+    limit: "10kb",
   })
 );
 
-// Parse JSON request bodies
-app.use(express.json({ limit: "10kb" }));
-
-// Parse URL-encoded request bodies
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// ========================================
+// RATE LIMITING
+// ========================================
 
 // General API rate limiter
 const apiLimiter = rateLimit({
@@ -79,7 +134,6 @@ const apiLimiter = rateLimit({
   },
 });
 
-// Apply general rate limiter
 app.use("/api", apiLimiter);
 
 // Authentication rate limiter
@@ -94,46 +148,40 @@ const authLimiter = rateLimit({
   },
 });
 
-// Authentication routes
+// ========================================
+// API ROUTES
+// ========================================
+
 app.use("/api/auth", authLimiter, authRoutes);
 
-// Product routes
 app.use("/api/products", productRoutes);
 
-// User routes
 app.use("/api/users", userRoutes);
 
-// Category routes
 app.use("/api/categories", categoryRoutes);
 
-// Cart routes
 app.use("/api/cart", cartRoutes);
 
-// Order routes
 app.use("/api/orders", orderRoutes);
 
-// Shipping routes
 app.use("/api/shipping", shippingRoutes);
 
-// Admin dashboard routes
 app.use("/api/admin", adminDashboardRoutes);
 
-// Admin customer management
 app.use("/api/admin/customers", adminUserRoutes);
 
-// Admin administrator management
 app.use("/api/admin/administrators", adminManagementRoutes);
 
-// Admin store settings
 app.use("/api/admin/settings", storeSettingRoutes);
 
-// Inventory history
 app.use("/api/inventory/history", inventoryHistoryRoutes);
 
-// Inventory management
 app.use("/api/inventory", inventoryRoutes);
 
-// Welcome route
+// ========================================
+// WELCOME ROUTE
+// ========================================
+
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -141,7 +189,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check route
+// ========================================
+// HEALTH CHECK
+// ========================================
+
 app.get("/api/health", (req, res) => {
   const databaseConnected = mongoose.connection.readyState === 1;
 
@@ -153,7 +204,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Handle unknown API routes
+// ========================================
+// UNKNOWN API ROUTES
+// ========================================
+
 app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
@@ -161,7 +215,10 @@ app.use("/api", (req, res) => {
   });
 });
 
-// Global error handler
+// ========================================
+// GLOBAL ERROR HANDLER
+// ========================================
+
 app.use((err, req, res, next) => {
   console.error("Server error:", err.message);
 
@@ -180,7 +237,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server after database connection
+// ========================================
+// START SERVER AFTER DATABASE CONNECTION
+// ========================================
+
 const startServer = async () => {
   try {
     await connectDB();
@@ -193,6 +253,12 @@ const startServer = async () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
       console.log("MongoDB connection established");
+      console.log("Allowed frontend origins:");
+
+      allowedOrigins.forEach((origin) => {
+        console.log(`- ${origin}`);
+      });
+
       console.log("-----------------------------------");
     });
 
@@ -220,6 +286,7 @@ const startServer = async () => {
 
     process.on("SIGTERM", () => shutdown("SIGTERM"));
     process.on("SIGINT", () => shutdown("SIGINT"));
+
   } catch (error) {
     console.error("Unable to start server:", error.message);
     process.exit(1);
