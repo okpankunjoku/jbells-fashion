@@ -53,6 +53,22 @@ function formatPrice(price) {
   return `₦${Number(price || 0).toLocaleString("en-NG")}`;
 }
 
+// Use the existing Vite image assets when MongoDB contains
+// an old, invalid /src/assets image path.
+function getProductImage(product) {
+  const savedImage = product.images?.[0];
+
+  const isOldInvalidPath =
+    typeof savedImage === "string" &&
+    savedImage.includes("/src/assets/products/");
+
+  if (!savedImage || isOldInvalidPath) {
+    return fallbackImages[product.name] || "";
+  }
+
+  return savedImage;
+}
+
 function Shop() {
   const { cartLoading, cartError, addItem } = useCart();
   const location = useLocation();
@@ -131,10 +147,7 @@ function Shop() {
               category: categoryName,
               price: Number(product.price || 0),
               description: product.description || "",
-              image:
-                product.images?.[0] ||
-                fallbackImages[product.name] ||
-                "",
+              image: getProductImage(product),
               variants,
               sizes,
               stock,
