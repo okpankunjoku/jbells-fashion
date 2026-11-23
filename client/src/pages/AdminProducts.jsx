@@ -56,6 +56,33 @@ const currency = (amount) =>
     maximumFractionDigits: 2,
   }).format(Number(amount) || 0);
 
+// Use the matching bundled JBELLS image when a saved product URL is broken.
+function getProductFallbackImage(product) {
+  const name = (product.name || "").toLowerCase();
+
+  if (name.includes("embroidered") || name.includes("jacket")) {
+    return embroideredJacketImage;
+  }
+
+  if (name.includes("purple") || name.includes("trouser")) {
+    return purpleTrousersImage;
+  }
+
+  if (name.includes("floral") || name.includes("green floral")) {
+    return greenFloralShirtImage;
+  }
+
+  if (
+    name.includes("tropical") ||
+    name.includes("print") ||
+    name.includes("short")
+  ) {
+    return tropicalSetImage;
+  }
+
+  return "";
+}
+
 function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -624,6 +651,24 @@ function AdminProducts() {
                       {product.images?.[0] ? (
                         <img
                           src={product.images[0]}
+                          alt={product.name}
+                          onError={(event) => {
+                            const fallbackImage = getProductFallbackImage(product);
+
+                            if (
+                              fallbackImage &&
+                              !event.currentTarget.dataset.fallbackApplied
+                            ) {
+                              event.currentTarget.dataset.fallbackApplied = "true";
+                              event.currentTarget.src = fallbackImage;
+                            } else {
+                              event.currentTarget.style.display = "none";
+                            }
+                          }}
+                        />
+                      ) : getProductFallbackImage(product) ? (
+                        <img
+                          src={getProductFallbackImage(product)}
                           alt={product.name}
                         />
                       ) : (
