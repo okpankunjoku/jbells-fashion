@@ -23,8 +23,10 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
+
 import API from "../api/api";
 import "../App.css";
+
 import AdminProducts from "./AdminProducts";
 import AdminCategories from "./AdminCategories";
 import AdminInventory from "./AdminInventory";
@@ -188,7 +190,11 @@ function AdminDashboard() {
 
   return (
     <div className="admin-page">
-      <aside className={`admin-sidebar ${menuOpen ? "admin-sidebar-open" : ""}`}>
+      <aside
+        className={`admin-sidebar ${
+          menuOpen ? "admin-sidebar-open" : ""
+        }`}
+      >
         <div className="admin-brand">
           <Link to="/">JBELLS</Link>
           <span>ADMINISTRATION</span>
@@ -198,6 +204,7 @@ function AdminDashboard() {
           <div className="admin-profile-avatar">
             {adminName.charAt(0).toUpperCase()}
           </div>
+
           <div>
             <strong>{adminName}</strong>
             <span>Administrator</span>
@@ -256,6 +263,7 @@ function AdminDashboard() {
 
           <div className="admin-search">
             <Search size={18} />
+
             <input
               type="search"
               placeholder="Search administration..."
@@ -272,9 +280,15 @@ function AdminDashboard() {
         <div className="admin-content">
           <div className="admin-page-heading">
             <div>
-              <p className="admin-eyebrow">JBELLS STORE MANAGEMENT</p>
+              <p className="admin-eyebrow">
+                JBELLS STORE MANAGEMENT
+              </p>
+
               <h1>{activeSection}</h1>
-              <p>Welcome to your JBELLS administration panel.</p>
+
+              <p>
+                Welcome to your JBELLS administration panel.
+              </p>
             </div>
 
             <button
@@ -294,6 +308,7 @@ function AdminDashboard() {
                 <div className="admin-data-error" role="alert">
                   <AlertTriangle size={19} />
                   <span>{error}</span>
+
                   <button type="button" onClick={loadDashboard}>
                     Retry
                   </button>
@@ -305,14 +320,20 @@ function AdminDashboard() {
                   const Icon = stat.icon;
 
                   return (
-                    <div className="admin-stat-card" key={stat.label}>
+                    <div
+                      className="admin-stat-card"
+                      key={stat.label}
+                    >
                       <div className="admin-stat-icon">
                         <Icon />
                       </div>
+
                       <span>{stat.label}</span>
+
                       <h2>
                         {loading ? "..." : stat.value}
                       </h2>
+
                       <small>
                         {loading
                           ? "Loading information..."
@@ -328,24 +349,36 @@ function AdminDashboard() {
                   <div className="admin-stat-icon">
                     <ClipboardList />
                   </div>
+
                   <span>Pending Orders</span>
-                  <h2>{loading ? "..." : summary.pendingOrders}</h2>
+
+                  <h2>
+                    {loading ? "..." : summary.pendingOrders}
+                  </h2>
                 </div>
 
                 <div className="admin-stat-card">
                   <div className="admin-stat-icon">
                     <Tags />
                   </div>
+
                   <span>Active Categories</span>
-                  <h2>{loading ? "..." : summary.totalCategories}</h2>
+
+                  <h2>
+                    {loading ? "..." : summary.totalCategories}
+                  </h2>
                 </div>
 
                 <div className="admin-stat-card">
                   <div className="admin-stat-icon">
                     <AlertTriangle />
                   </div>
+
                   <span>Low Stock Variants</span>
-                  <h2>{loading ? "..." : summary.lowStockCount}</h2>
+
+                  <h2>
+                    {loading ? "..." : summary.lowStockCount}
+                  </h2>
                 </div>
               </div>
 
@@ -356,6 +389,7 @@ function AdminDashboard() {
                       <h2>Recent Orders</h2>
                       <p>Your latest customer orders</p>
                     </div>
+
                     <TrendingUp size={21} />
                   </div>
 
@@ -364,7 +398,9 @@ function AdminDashboard() {
                   ) : recentOrders.length === 0 ? (
                     <div className="admin-overview-message">
                       <ClipboardList size={35} />
+
                       <h3>No orders yet</h3>
+
                       <p>
                         Customer orders will appear here when purchases
                         are placed.
@@ -382,24 +418,35 @@ function AdminDashboard() {
                             <th>Date</th>
                           </tr>
                         </thead>
+
                         <tbody>
                           {recentOrders.map((order, index) => (
                             <tr key={order._id || index}>
                               <td>
                                 {order.orderNumber || "Order"}
                               </td>
+
                               <td>
                                 {order.user
-                                  ? `${order.user.firstName || ""} ${order.user.lastName || ""}`.trim() ||
+                                  ? `${order.user.firstName || ""} ${
+                                      order.user.lastName || ""
+                                    }`.trim() ||
                                     order.user.email ||
                                     "Customer"
                                   : "Customer"}
                               </td>
-                              <td>{formatCurrency(order.totalAmount)}</td>
+
+                              <td>
+                                {formatCurrency(order.totalAmount)}
+                              </td>
+
                               <td>
                                 {order.orderStatus || "Pending"}
                               </td>
-                              <td>{formatDate(order.createdAt)}</td>
+
+                              <td>
+                                {formatDate(order.createdAt)}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -441,8 +488,11 @@ function AdminDashboard() {
                 <div className="admin-panel-heading">
                   <div>
                     <h2>Low Stock Alerts</h2>
-                    <p>Product variations with five or fewer units</p>
+                    <p>
+                      Product variations with five or fewer units
+                    </p>
                   </div>
+
                   <AlertTriangle size={21} />
                 </div>
 
@@ -464,9 +514,12 @@ function AdminDashboard() {
                           <th>Available Stock</th>
                         </tr>
                       </thead>
+
                       <tbody>
                         {lowStockProducts.map((item, index) => (
-                          <tr key={`${item.productId}-${item.sku}-${index}`}>
+                          <tr
+                            key={`${item.productId}-${item.sku}-${index}`}
+                          >
                             <td>{item.productName}</td>
                             <td>{item.sku}</td>
                             <td>{item.size}</td>
@@ -480,29 +533,32 @@ function AdminDashboard() {
                 )}
               </section>
             </>
-          
           ) : activeSection === "Products" ? (
             <AdminProducts />
-         ) : activeSection === "Categories" ? (
-  <AdminCategories />
-) : activeSection === "Orders" ? (
-  <AdminOrders />
-) : activeSection === "Customers" ? (
-  <AdminCustomers />
-) : activeSection === "Sales Reports" ? (
-  <AdminSalesReports />
+          ) : activeSection === "Categories" ? (
+            <AdminCategories />
+          ) : activeSection === "Orders" ? (
+            <AdminOrders />
+          ) : activeSection === "Customers" ? (
+            <AdminCustomers />
+          ) : activeSection === "Inventory" ? (
+            <AdminInventory />
+          ) : activeSection === "Sales Reports" ? (
+            <AdminSalesReports />
           ) : activeSection === "Settings" ? (
             <AdminSettings />
-
           ) : (
             <section className="admin-panel admin-section-placeholder">
               <ClipboardList size={38} />
+
               <h2>{activeSection}</h2>
+
               <p>
                 The {activeSection.toLowerCase()} management section
                 will be developed and connected to the backend in
                 the next stages.
               </p>
+
               <button
                 type="button"
                 onClick={() => selectSection("Dashboard")}
@@ -517,6 +573,7 @@ function AdminDashboard() {
           <span>
             © {new Date().getFullYear()} JBELLS. All rights reserved.
           </span>
+
           <span>Administration Panel</span>
         </footer>
       </main>
