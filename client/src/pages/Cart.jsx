@@ -112,6 +112,7 @@ function Cart() {
 
         {!cartLoading && cart.length > 0 && (
           <div
+            className="cart-layout"
             style={{
               display: "grid",
               gridTemplateColumns:
@@ -120,6 +121,7 @@ function Cart() {
               alignItems: "start",
             }}
           >
+            {/* CART PRODUCTS */}
             <div style={{ display: "grid", gap: "18px" }}>
               {cart.map((item) => {
                 const itemBusy = busyItem === item.cartKey;
@@ -140,6 +142,7 @@ function Cart() {
                       background: "#fff",
                     }}
                   >
+                    {/* PRODUCT IMAGE */}
                     <div
                       style={{
                         width: "110px",
@@ -173,6 +176,7 @@ function Cart() {
                       )}
                     </div>
 
+                    {/* PRODUCT DETAILS */}
                     <div style={{ minWidth: 0 }}>
                       <div
                         style={{
@@ -224,6 +228,7 @@ function Cart() {
                         {formatPrice(item.price)} each
                       </p>
 
+                      {/* QUANTITY CONTROLS */}
                       <div
                         style={{
                           display: "flex",
@@ -325,6 +330,7 @@ function Cart() {
               })}
             </div>
 
+            {/* ORDER SUMMARY */}
             <aside
               style={{
                 padding: "24px",

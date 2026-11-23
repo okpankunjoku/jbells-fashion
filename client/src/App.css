@@ -4981,3 +4981,92 @@ select:focus-visible {
     margin-top: 8px;
   }
 }
+
+
+/* =========================================
+   JBELLS SHOPPING CART RESPONSIVENESS
+========================================= */
+
+@media (max-width: 700px) {
+  .cart-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 22px !important;
+    width: 100%;
+  }
+
+  .cart-layout > div {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .cart-layout article {
+    grid-template-columns: 90px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .cart-layout article > div:first-child {
+    width: 90px !important;
+    height: 115px !important;
+    min-width: 0;
+  }
+
+  .cart-layout article img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cart-layout article > div:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .cart-layout article strong {
+    overflow-wrap: anywhere;
+  }
+
+  .cart-layout article button {
+    max-width: 100%;
+  }
+
+  .cart-layout aside {
+    width: 100%;
+    min-width: 0;
+    padding: 18px !important;
+    box-sizing: border-box;
+  }
+
+  .cart-layout aside h2 {
+    font-size: 27px;
+  }
+
+  .cart-layout aside a {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 380px) {
+  .cart-layout article {
+    grid-template-columns: 75px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+
+  .cart-layout article > div:first-child {
+    width: 75px !important;
+    height: 100px !important;
+  }
+
+  .cart-layout aside {
+    padding: 14px !important;
+  }
+
+  .cart-layout aside h2 {
+    font-size: 23px;
+  }
+}
