@@ -20,6 +20,20 @@ function formatPrice(price) {
     return `₦${Number(price || 0).toLocaleString("en-NG")}`;
 }
 
+function getProductImage(product) {
+    const savedImage = product.images?.[0];
+
+    const isOldInvalidPath =
+        typeof savedImage === "string" &&
+        savedImage.includes("/src/assets/products/");
+
+    if (!savedImage || isOldInvalidPath) {
+        return fallbackImages[product.name] || "";
+    }
+
+    return savedImage;
+}
+
 function Home() {
     const { addItem } = useCart();
 
@@ -66,10 +80,7 @@ function Home() {
                                 product.category?.name || "Clothing",
                             price: Number(product.price),
                             description: product.description || "",
-                            image:
-                                product.images?.[0] ||
-                                fallbackImages[product.name] ||
-                                "",
+                            image: getProductImage(product),
                             variants,
                             sizes: availableSizes,
                             stock: totalStock,
