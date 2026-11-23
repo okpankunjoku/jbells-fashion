@@ -5,6 +5,31 @@ import { ArrowRight, RefreshCw, Layers3 } from "lucide-react";
 
 import API from "../api/api";
 
+import tropicalSet from "../assets/products/tropical-set.jpg";
+import greenFloralShirt from "../assets/products/green-floral-shirt.jpg";
+import purpleTrousers from "../assets/products/purple-trousers.jpg";
+import embroideredJacket from "../assets/products/embroidered-jacket.jpg";
+
+// Local fallback images for existing JBELLS products.
+const fallbackImages = {
+  "Tropical Print Shirt & Shorts Set": tropicalSet,
+  "Green Floral Shirt": greenFloralShirt,
+  "Purple Formal Trousers": purpleTrousers,
+  "Green Embroidered Jacket": embroideredJacket,
+};
+
+// Ignore old broken local source paths saved in MongoDB.
+// Keep valid external image URLs, including future Cloudinary URLs.
+function getProductImage(product) {
+  const image = product.images?.[0] || "";
+
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
+
+  return fallbackImages[product.name] || "";
+}
+
 function Categories() {
   const navigate = useNavigate();
 
@@ -24,7 +49,9 @@ function Categories() {
         const fetchedProducts = response.data?.products || [];
 
         if (!Array.isArray(fetchedProducts)) {
-          throw new Error("The products response was not in the expected format.");
+          throw new Error(
+            "The products response was not in the expected format."
+          );
         }
 
         if (isMounted) {
@@ -54,7 +81,7 @@ function Categories() {
     };
   }, []);
 
-  // Build categories from the products returned by the backend.
+  // Build categories from products returned by the backend.
   const categories = useMemo(() => {
     const categoryMap = new Map();
 
@@ -69,7 +96,7 @@ function Categories() {
       if (!categoryMap.has(categoryName)) {
         categoryMap.set(categoryName, {
           name: categoryName,
-          image: product.images?.[0] || "",
+          image: getProductImage(product),
           productCount: 0,
         });
       }
@@ -77,8 +104,9 @@ function Categories() {
       const category = categoryMap.get(categoryName);
       category.productCount += 1;
 
-      if (!category.image && product.images?.[0]) {
-        category.image = product.images[0];
+      // Use another product's image if the first product has none.
+      if (!category.image) {
+        category.image = getProductImage(product);
       }
     });
 
@@ -98,11 +126,13 @@ function Categories() {
       <section className="categories-hero">
         <div className="categories-hero-content">
           <span className="eyebrow">THE JBELLS COLLECTION</span>
+
           <h1>
             Find Your
             <br />
             <em>Own Style.</em>
           </h1>
+
           <p>
             Explore our collections of male and unisex clothing.
             Find pieces that express your personality and make
@@ -116,6 +146,7 @@ function Categories() {
           <div>
             <span className="eyebrow">EXPLORE JBELLS</span>
             <h2>Shop by Category</h2>
+
             <p>
               Browse our available collections and discover
               something that fits your style.
@@ -125,7 +156,8 @@ function Categories() {
           <div className="categories-total">
             <Layers3 size={20} />
             <span>
-              {categories.length} {categories.length === 1 ? "Category" : "Categories"}
+              {categories.length}{" "}
+              {categories.length === 1 ? "Category" : "Categories"}
             </span>
           </div>
         </div>
@@ -138,6 +170,7 @@ function Categories() {
         ) : error ? (
           <div className="categories-message categories-error">
             <p>{error}</p>
+
             <button
               type="button"
               onClick={() => window.location.reload()}
@@ -149,6 +182,7 @@ function Categories() {
           <div className="categories-message">
             <Layers3 size={34} />
             <h3>No categories available yet</h3>
+
             <p>
               Categories will appear here when products have
               been added to the store.
@@ -169,6 +203,9 @@ function Categories() {
                       src={category.image}
                       alt={category.name}
                       loading="lazy"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
                     />
                   ) : (
                     <div className="category-image-placeholder">
@@ -184,9 +221,12 @@ function Categories() {
                 <div className="category-card-info">
                   <div>
                     <h3>{category.name}</h3>
+
                     <p>
                       {category.productCount}{" "}
-                      {category.productCount === 1 ? "Product" : "Products"}
+                      {category.productCount === 1
+                        ? "Product"
+                        : "Products"}
                     </p>
                   </div>
 
@@ -200,8 +240,12 @@ function Categories() {
         )}
 
         <div className="categories-bottom">
-          <span className="eyebrow">STYLE · COMFORT · CONFIDENCE</span>
+          <span className="eyebrow">
+            STYLE · COMFORT · CONFIDENCE
+          </span>
+
           <h2>Discover your next favourite look.</h2>
+
           <button
             type="button"
             className="categories-shop-button"
