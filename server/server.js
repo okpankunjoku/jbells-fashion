@@ -37,6 +37,12 @@ const storeSettingRoutes = require("./routes/storeSettingRoutes");
 const app = express();
 
 // ========================================
+// RENDER PROXY CONFIGURATION
+// ========================================
+
+app.set("trust proxy", 1);
+
+// ========================================
 // CORS CONFIGURATION
 // ========================================
 
